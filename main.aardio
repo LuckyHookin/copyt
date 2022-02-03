@@ -1,0 +1,72 @@
+import win.ui;
+/*DSG{{*/
+mainForm = win.form(text="copyt";right=663;bottom=391)
+mainForm.add(
+button={cls="button";text="开始整理";left=512;top=144;right=584;bottom=176;db=0.55;dr=1;z=2};
+button2={cls="button";text="停止整理";left=584;top=144;right=656;bottom=176;db=0.55;disabled=1;dr=1;z=1};
+button3={cls="button";text="选择";left=64;top=96;right=104;bottom=112;ah=1;dl=1;font=LOGFONT(h=-9);z=12};
+button4={cls="button";text="选择";left=64;top=152;right=104;bottom=168;ah=1;dl=1;font=LOGFONT(h=-9);z=13};
+codeFilePath={cls="edit";left=112;top=128;right=472;bottom=176;ah=1;autovscroll=false;dl=1;edge=1;hscroll=1;multiline=1;z=10};
+dir={cls="edit";left=112;top=72;right=472;bottom=120;ah=1;autovscroll=false;dl=1;edge=1;hscroll=1;multiline=1;z=8};
+excludeDir={cls="edit";text="node_modules|dist";left=304;top=8;right=472;bottom=56;ah=1;autohscroll=false;dl=1;edge=1;multiline=1;vscroll=1;z=6};
+fileType={cls="edit";text=".js|.vue|.jsx|.mjs|.ts";left=72;top=8;right=216;bottom=56;ah=1;autohscroll=false;dl=1;edge=1;multiline=1;vscroll=1;z=4};
+richedit={cls="richedit";left=8;top=184;right=656;bottom=384;autohscroll=false;db=1;dl=1;dr=1;dt=0.47;edge=1;multiline=1;vscroll=1;z=14};
+static={cls="static";text="文件类型";left=16;top=8;right=72;bottom=24;ah=1;dl=1;transparent=1;z=3};
+static2={cls="static";text="过滤文件夹";left=232;top=8;right=304;bottom=24;ah=1;dl=1;transparent=1;z=5};
+static3={cls="static";text="欲处理项目路径";left=16;top=72;right=112;bottom=88;ah=1;dl=1;transparent=1;z=7};
+static4={cls="static";text="汇总代码存放
+路径";left=16;top=128;right=104;bottom=168;ah=1;dl=1;transparent=1;z=9};
+static5={cls="static";text="本工具用于整理项目代码，功能包括代码汇总、空行与注释的剔除。";left=488;top=8;right=656;bottom=136;ah=1;color=8421376;dl=1;transparent=1;z=11}
+)
+/*}}*/
+
+import fsys.dlg.dir;
+
+import nodeJs;
+var prcs = null;
+nodeJs.install(true);
+mainForm.dir.text="C:\";
+mainForm.codeFilePath.text=io.localpath("~\code.txt")
+mainForm.button.oncommand = function(id,event){
+	mainForm.richedit.text="";
+	
+	mainForm.button.hide=true;
+	mainForm.button2.disabled=false;
+
+	var js = string.load("\res\index.js");
+	
+	prcs = nodeJs.exec(js,mainForm.dir.text,mainForm.fileType.text,mainForm.excludeDir.text,mainForm.codeFilePath.text);
+	
+	prcs.logResponse(function(v){
+		mainForm.richedit.log(v);
+	});
+	
+	prcs.waitOne();
+	mainForm.button.hide=false;
+	mainForm.button2.disabled=true;
+
+}
+
+mainForm.button2.oncommand = function(id,event){
+	if(mainForm.button.hide==false){
+		return ; 
+	}
+	prcs.terminate();
+}
+
+
+
+mainForm.button3.oncommand = function(id,event){
+	mainForm.dir.text = fsys.dlg.dir();
+}
+
+mainForm.button4.oncommand = function(id,event){
+	mainForm.codeFilePath.text = fsys.dlg.dir()++"\code.txt";
+}
+
+mainForm.onClose = function(hwnd,message,wParam,lParam){
+    mainForm.button2.oncommand();
+}
+
+mainForm.show();
+return win.loopMessage();
