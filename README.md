@@ -73,3 +73,4 @@ api.crawl(dir).withPromise().then((files) => {
     console.log('ok!');
 });
 ```
+软著申请流程：https://juejin.cn/post/7057381729430372383
